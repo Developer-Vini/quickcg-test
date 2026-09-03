@@ -1,9 +1,15 @@
 #!/bin/bash
-g++ main.cpp quickcg.cpp -o main -lSDL -lSDL_gfx
+set -e
 
-if [ $? -eq 0 ]; then
-    echo "Compilou com sucesso! Rodando..."
-    ./main
-else
-    echo "Erro na compilação."
-fi
+SRC="src"
+LIB="lib"
+INC="include"
+BIN="bin"
+OUT="$BIN/main"
+
+mkdir -p "$BIN"
+
+g++ -I"$INC" "$SRC/main.cpp" "$LIB/quickcg.cpp" -o "$OUT" -lSDL -lSDL_gfx
+
+echo "Compilou: $OUT"
+./"$OUT"
