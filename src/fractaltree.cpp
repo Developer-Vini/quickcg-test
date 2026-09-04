@@ -8,7 +8,7 @@ void tree(int x, int y, double len, double angle, int depth) {
     int y2 = y + (int)(sin(angle) * len);
     unsigned char green = 100 + depth * 25;
     ColorRGB col(80 + depth * 20, green, 60);
-    line(x, y, x2, y2, col);
+    drawLine(x, y, x2, y2, col);
     tree(x2, y2, len * 0.72, angle - 0.5, depth - 1);
     tree(x2, y2, len * 0.72, angle + 0.5, depth - 1);
 }
