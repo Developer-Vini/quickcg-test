@@ -67,67 +67,62 @@ int main(int argc, char *argv[]) {
     screen(800, 600, "Mandelbrot - QuickCG");
     View view{-0.75, 0.0, 1.0};
     int maxIter = 100;
-    bool showMenu = true;
+    int lastIter = maxIter;
 
     drawMandelbrot(view, maxIter);
 
     while (true) {
-        int key = readkey();
-        if (key == SDLK_ESCAPE) break;
-        if (key == 'r' || key == 'R') {
+        readKeys();
+
+        if (keyDown(SDLK_ESCAPE)) break;
+        if (keyPressed('r') || keyPressed('R')) {
             view.cx = -0.75;
             view.cy = 0.0;
             view.zoom = 1.0;
             maxIter = 100;
+            lastIter = maxIter;
             drawMandelbrot(view, maxIter);
         }
-        if (key == '+') {
+        if (keyPressed('+') || keyPressed('=')) {
             view.zoom *= 1.3;
             maxIter = min(maxIter + 20, 1000);
+            lastIter = maxIter;
             drawMandelbrot(view, maxIter);
         }
-        if (key == '-') {
+        if (keyPressed('-') || keyPressed('_')) {
             view.zoom /= 1.3;
             maxIter = max(maxIter - 20, 20);
+            lastIter = maxIter;
             drawMandelbrot(view, maxIter);
         }
         double pan = 0.05 / view.zoom;
-        if (key == SDLK_LEFT) {
-            view.cx -= pan;
-            drawMandelbrot(view, maxIter);
-        }
-        if (key == SDLK_RIGHT) {
-            view.cx += pan;
-            drawMandelbrot(view, maxIter);
-        }
-        if (key == SDLK_UP) {
-            view.cy -= pan;
-            drawMandelbrot(view, maxIter);
-        }
-        if (key == SDLK_DOWN) {
-            view.cy += pan;
-            drawMandelbrot(view, maxIter);
-        }
-        if (key == '1') {
-            maxIter = 50;
-            drawMandelbrot(view, maxIter);
-        }
-        if (key == '2') {
-            maxIter = 150;
-            drawMandelbrot(view, maxIter);
-        }
-        if (key == '3') {
-            maxIter = 500;
-            drawMandelbrot(view, maxIter);
-        }
-        if (key == 'h' || key == 'H') {
-            if (showMenu) {
-                cls(ColorRGB(0, 0, 0));
-                showHelp();
-                readkey();
-                drawMandelbrot(view, maxIter);
+        bool panned = false;
+        if (keyDown(SDLK_LEFT)) { view.cx -= pan; panned = true; }
+        if (keyDown(SDLK_RIGHT)) { view.cx += pan; panned = true; }
+        if (keyDown(SDLK_UP)) { view.cy -= pan; panned = true; }
+        if (keyDown(SDLK_DOWN)) { view.cy += pan; panned = true; }
+        if (panned) drawMandelbrot(view, maxIter);
+        if (keyPressed('1')) { maxIter = 50; lastIter = maxIter; drawMandelbrot(view, maxIter); }
+        if (keyPressed('2')) { maxIter = 150; lastIter = maxIter; drawMandelbrot(view, maxIter); }
+        if (keyPressed('3')) { maxIter = 500; lastIter = maxIter; drawMandelbrot(view, maxIter); }
+        if (keyPressed('h') || keyPressed('H')) {
+            cls(ColorRGB(0, 0, 0));
+            showHelp();
+            while (true) {
+                readKeys();
+                bool any = false;
+                for (int c = 32; c < 127; c++) if (keyDown(c)) any = true;
+                if (keyDown(SDLK_LEFT) || keyDown(SDLK_RIGHT) || keyDown(SDLK_UP) || keyDown(SDLK_DOWN)) any = true;
+                if (any) break;
+                sleep(0.01);
             }
+            drawMandelbrot(view, maxIter);
         }
+        if (maxIter != lastIter) {
+            lastIter = maxIter;
+            drawMandelbrot(view, maxIter);
+        }
+        sleep(0.016);
     }
     return 0;
 }
